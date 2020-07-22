@@ -1,8 +1,8 @@
-// Variables
+/* Variables */
 const date = new Date();
 const habitList = document.querySelector('.habit-list');
 
-// Functions
+/* Functions */
 
 // Display habits
 const displayHabits = () => {
@@ -12,12 +12,14 @@ const displayHabits = () => {
         
         habitList.insertAdjacentHTML("beforeend", `
             <div class="habit" id="${habit.id}">
-                <h3>${habit.name}</h3>
-                <h3>Added on ${habit.startDate}</h3>
-                <h3 id="current-date">Today is ${date.toDateString()}</h3>
-                <h1>${habit.count}</h1>
+                <h1>${habit.name}</h3>
+                <h1 id="habit-count">${habit.count}</h1>
+                <h3>Started on ${habit.startDate}</h3>
+                <h3>Today is ${date.toDateString()}</h3>
                 <h3>Your record is ${habit.record} days</h3>
-                <button type="button" class="button-completed" id="btn-completed">Completed</button>
+                <button type="button" class="button-add-count" id="btn-add-count">+</button>
+                <button type="button" class="button-minus-count" id="btn-minus-count">-</button>
+                <button type="button" class="button-remove-habit" id="btn-remove-habit">x</button>
             </div>
         `) 
 
@@ -25,36 +27,38 @@ const displayHabits = () => {
     }
 }
 
-// Events
+/* Events */
 
 // Add habit
 const addHabit = document.querySelector('#btn-add-habit');
 addHabit.addEventListener('click', (e) => {
     e.preventDefault();
 
-    let habitName = document.querySelector('#habit-name').value;
+    let habitName = document.querySelector('#habit-name').value.toUpperCase();
     if (habitName === '') {
-        habitName = 'New Habit';
+        habitName = 'NEW HABIT';
     }
 
     let habitObject = {
-        id: `${Math.floor(Math.random() * 999999999)}`,
+        id: `num_${Math.floor(Math.random() * 999999999)}`,
         name: habitName,
         startDate: date.toDateString(),
         count: 0,
         record: 0
     }
 
-    localStorage.setItem(`${habitObject.name}-${habitObject.id}`, JSON.stringify(habitObject));
+    localStorage.setItem(`${habitObject.id}`, JSON.stringify(habitObject));
 
     habitList.insertAdjacentHTML("beforeend", `
         <div class="habit" id="${habitObject.id}">
-            <h3>${habitObject.name}</h3>
-            <h3>Added on ${habitObject.startDate}</h3>
-            <h3 id="current-date">Today is ${date.toDateString()}</h3>
-            <h1>${habitObject.count}</h1>
+            <h1>${habitObject.name}</h3>
+            <h1 id="habit-count">${habitObject.count}</h1>
+            <h3>Started on ${habitObject.startDate}</h3>
+            <h3>Today is ${date.toDateString()}</h3>
             <h3>Your record is ${habitObject.record} days</h3>
-            <button type="button" class="button-completed" id="btn-completed">Completed</button>
+            <button type="button" class="button-add-count" id="btn-add-count">+</button>
+            <button type="button" class="button-minus-count" id="btn-minus-count">-</button>
+            <button type="button" class="button-remove-habit" id="btn-remove-habit">x</button>
         </div>
     `)
 
@@ -63,7 +67,23 @@ addHabit.addEventListener('click', (e) => {
 
 // Update habit
 document.addEventListener('click', (e) => {
-    if (e.target.id === 'btn-completed') {
+    if (e.target.id === 'btn-remove-habit') {
+        let i = 0;
+        while (i < localStorage.length) {
+            let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
+
+            if (e.target.parentNode.id == habit.id) {
+                localStorage.removeItem(localStorage.key(i));
+
+                let item = document.querySelector(`#${e.target.parentNode.id}`);
+                item.remove();
+            }
+
+            i++;
+        }
+    }
+
+    if (e.target.id === 'btn-add-count') {
         let updatedCount = 0;
 
         let i = 0;
@@ -83,7 +103,41 @@ document.addEventListener('click', (e) => {
         let j = 0;
         while (j < habitList.children.length) {
             if (habitList.children[j].id == e.target.parentNode.id) {
-                habitList.children[j].querySelector('h1').innerHTML = `${updatedCount}`;
+                habitList.children[j].querySelector('#habit-count').innerHTML = `${updatedCount}`;
+                
+                // implement record...
+            }
+
+            j++;
+        }
+    }
+
+    if (e.target.id === 'btn-minus-count') {
+        let updatedCount = 0;
+
+        let i = 0;
+        while (i < localStorage.length) {
+            let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
+
+            if (e.target.parentNode.id == habit.id) {
+                habit.count = habit.count - 1;
+                
+                if (habit.count < 0) {
+                    habit.count = 0;
+                }
+
+                localStorage.setItem(localStorage.key(i), JSON.stringify(habit));
+
+                updatedCount = habit.count;
+            }
+
+            i++;
+        }
+
+        let j = 0;
+        while (j < habitList.children.length) {
+            if (habitList.children[j].id == e.target.parentNode.id) {
+                habitList.children[j].querySelector('#habit-count').innerHTML = `${updatedCount}`;
                 
                 // implement record...
             }
