@@ -1,150 +1,284 @@
-/* Variables */
+// Variables
 const date = new Date();
-const habitList = document.querySelector('.habit-list');
 
-/* Functions */
+let habitObject = {
+    id: '',
+    name: '',
+    startDate: '',
+    score: 0,
+    streak: 0,
+    record: 0,
+    completed: false,
+    doButton: '',
+    undoButton: 'disabled'
+}
 
-// Display habits
-const displayHabits = () => {
+const list = document.querySelector('#habit-list');
+const form = document.querySelector('#habit-form');
+
+// Functions
+
+/* 
+ * removeHabit() deletes the selected habit from localStorage and from the DOM.
+ */
+const removeHabit = (event) => {
     let i = 0;
-    while(i < localStorage.length) {
+    while (i < localStorage.length) {
         let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
-        
-        habitList.insertAdjacentHTML("beforeend", `
-            <div class="habit" id="${habit.id}">
-                <h1>${habit.name}</h3>
-                <h1 id="habit-count">${habit.count}</h1>
-                <h3>Started on ${habit.startDate}</h3>
-                <h3>Today is ${date.toDateString()}</h3>
-                <h3>Your record is ${habit.record} days</h3>
-                <button type="button" class="button-add-count" id="btn-add-count">+</button>
-                <button type="button" class="button-minus-count" id="btn-minus-count">-</button>
-                <button type="button" class="button-remove-habit" id="btn-remove-habit">x</button>
-            </div>
-        `) 
+
+        if (event.target.parentElement.parentElement.id == habit.id) {
+            localStorage.removeItem(localStorage.key(i));
+
+            let domHabit = document.querySelector(`#${event.target.parentElement.parentElement.id}`);
+            domHabit.remove();
+        }
 
         i++;
     }
 }
 
-/* Events */
+/* 
+ * completedHabit() indicates the selected habit was completed for the day. 
+ * The habit's properties are updated in localStorage and the DOM.
+ */
+const completedHabit = (event) => {
+    let updatedScore = 0;
+    let updatedStreak = 0;
 
-// Add habit
-const addHabit = document.querySelector('#btn-add-habit');
-addHabit.addEventListener('click', (e) => {
+    let i = 0;
+    while (i < localStorage.length) {
+        let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
+
+        if (event.target.parentElement.parentElement.id == habit.id) {
+            habit.completed = true;
+
+            habit.doButton = 'disabled';
+            habit.undoButton = '';
+
+            habit.score++;
+            habit.streak++;
+
+            localStorage.setItem(localStorage.key(i), JSON.stringify(habit));
+
+            updatedScore = habit.score;
+            updatedStreak = habit.streak;
+        }
+
+        i++;
+    }
+
+    let j = 0;
+    while (j < list.children.length) {
+        if (list.children[j].id == event.target.parentElement.parentElement.id) {
+            list.children[j].querySelector('#btn-do').disabled = true;
+            list.children[j].querySelector('#btn-undo').disabled = false;
+            list.children[j].querySelector('#habit-score').innerHTML = `${updatedScore}`;
+            list.children[j].querySelector('#habit-streak').innerHTML = `Streak: ${updatedStreak} days`;
+        }
+
+        j++;
+    }
+}
+
+/*
+ * ongoingHabit() indicates the selected habit has not been completed for the day.
+ * The habit's properties are updated in localStorage and the DOM.
+ */
+const ongoingHabit = (event) => {
+    let updatedScore = 0;
+    let updatedStreak = 0;
+
+    let i = 0;
+    while (i < localStorage.length) {
+        let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
+
+        if (event.target.parentElement.parentElement.id == habit.id) {
+            habit.completed = false;
+
+            habit.doButton = '';
+            habit.undoButton = 'disabled';
+            
+            habit.score--;
+            habit.streak--;
+
+            localStorage.setItem(localStorage.key(i), JSON.stringify(habit));
+
+            updatedScore = habit.score;
+            updatedStreak = habit.streak;
+        }
+
+        i++;
+    }
+
+    let j = 0;
+    while (j < list.children.length) {
+        if (list.children[j].id == event.target.parentElement.parentElement.id) {
+            list.children[j].querySelector('#btn-do').disabled = false;
+            list.children[j].querySelector('#btn-undo').disabled = true;
+            list.children[j].querySelector('#habit-score').innerHTML = `${updatedScore}`;
+            list.children[j].querySelector('#habit-streak').innerHTML = `Streak: ${updatedStreak} days`;
+        }
+
+        j++;
+    }
+}
+
+/*
+ * displayHabit() creates DOM elements for a habit.
+ */
+const displayHabit = (habit) => {
+    let li = document.createElement('li');
+    li.setAttribute('class', 'habit');
+    li.setAttribute('id', `${habit.id}`);
+
+    let pName = document.createElement('p');
+    pName.textContent = `${habit.name}`;
+    pName.setAttribute('id', 'habit-name');
+
+    let pScore = document.createElement('p');
+    pScore.textContent = `${habit.score}`;
+    pScore.setAttribute('id', 'habit-score');
+
+    let pStart = document.createElement('p');
+    pStart.textContent = `Started: ${habit.startDate}`;
+    pStart.setAttribute('id', 'habit-start');
+
+    let pStreak = document.createElement('p');
+    pStreak.textContent = `Streak: ${habit.streak} days`;
+    pStreak.setAttribute('id', 'habit-streak');
+
+    let pRecord = document.createElement('p');
+    pRecord.textContent = `Record: ${habit.record} days`;
+    pRecord.setAttribute('id', 'habit-record');
+
+    let div = document.createElement('div');
+    div.setAttribute('class', 'button-container');
+    
+    let buttonDo = document.createElement('button');
+    buttonDo.setAttribute('class', 'button-do');
+    buttonDo.setAttribute('id', 'btn-do');
+    buttonDo.textContent = '+';
+
+    let buttonUndo = document.createElement('button');
+    buttonUndo.setAttribute('class', 'button-undo');
+    buttonUndo.setAttribute('id', 'btn-undo');
+    buttonUndo.textContent = '-';
+
+    let buttonRemove = document.createElement('button');
+    buttonRemove.setAttribute('class', 'button-remove');
+    buttonRemove.setAttribute('id', 'btn-remove');
+    buttonRemove.textContent = 'x';
+
+    div.appendChild(buttonDo);
+    div.appendChild(buttonUndo);
+    div.appendChild(buttonRemove);
+
+    li.appendChild(pName);
+    li.appendChild(pScore);
+    li.appendChild(pStart);
+    li.appendChild(pStreak);
+    li.appendChild(pRecord);
+    li.appendChild(div);
+
+    list.appendChild(li);
+}
+
+/*
+ * displayAllHabits() displays all habits in localStorage using the function displayHabit().
+ * window.onload calls this function.
+ */
+const displayAllHabits = () => {
+    let i = 0;
+    while(i < localStorage.length) {
+        let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
+
+        displayHabit(habit);
+
+        i++;
+    }
+}
+
+/*
+ * nextDay() resets each habit's stats for the next day.
+ * If the user completed their habit during the day, their streak will continue.
+ * If the user does not complete their habit during the day, their streak and score will reset to 0.
+ * The user's record will be updated after each day.
+ * window.setInterval calls this function.
+ */
+const nextDay = () => {
+    let time = new Date();
+    if (time.toLocaleDateString() === '12:00:00 AM') {
+        let i = 0;
+        while (i < localStorage.length) {
+            let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
+    
+            if (habit.record < habit.streak) {
+                habit.record = habit.streak;
+            }
+    
+            if (habit.completed === false) {
+                habit.score = 0;
+                habit.streak = 0;
+            }
+    
+            habit.doButton = '';
+            habit.undoButton = 'disabled';
+            habit.completed = false;
+    
+            localStorage.setItem(localStorage.key(i), JSON.stringify(habit));
+    
+            i++;
+        }
+    
+        window.location.reload();
+    }
+}
+
+// Events
+
+/*
+ * Listens to form submission.
+ * A new habit is added to localStorage and displayed to the user.
+ */
+form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    let habitName = document.querySelector('#habit-name').value.toUpperCase();
-    if (habitName === '') {
-        habitName = 'NEW HABIT';
+    habitObject.id = `id_${Math.floor(Math.random() * 1000000)}`;
+
+    if (form.name.value === '') {
+        habitObject.name = 'New Habit';
+    } else {
+        habitObject.name = form.name.value;
     }
 
-    let habitObject = {
-        id: `num_${Math.floor(Math.random() * 999999999)}`,
-        name: habitName,
-        startDate: date.toDateString(),
-        count: 0,
-        record: 0
-    }
+    habitObject.startDate = date.toDateString();
 
-    localStorage.setItem(`${habitObject.id}`, JSON.stringify(habitObject));
+    localStorage.setItem(habitObject.id, JSON.stringify(habitObject));
 
-    habitList.insertAdjacentHTML("beforeend", `
-        <div class="habit" id="${habitObject.id}">
-            <h1>${habitObject.name}</h3>
-            <h1 id="habit-count">${habitObject.count}</h1>
-            <h3>Started on ${habitObject.startDate}</h3>
-            <h3>Today is ${date.toDateString()}</h3>
-            <h3>Your record is ${habitObject.record} days</h3>
-            <button type="button" class="button-add-count" id="btn-add-count">+</button>
-            <button type="button" class="button-minus-count" id="btn-minus-count">-</button>
-            <button type="button" class="button-remove-habit" id="btn-remove-habit">x</button>
-        </div>
-    `)
+    displayHabit(habitObject);
 
-    document.querySelector('#habit-name').value = '';
+    form.name.value = '';
 })
 
-// Update habit
+/* 
+ * Listens to the do (+), undo (-), and remove (x) buttons.
+ * Calls the associated function depending on the condition.
+ */
 document.addEventListener('click', (e) => {
-    if (e.target.id === 'btn-remove-habit') {
-        let i = 0;
-        while (i < localStorage.length) {
-            let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
-
-            if (e.target.parentNode.id == habit.id) {
-                localStorage.removeItem(localStorage.key(i));
-
-                let item = document.querySelector(`#${e.target.parentNode.id}`);
-                item.remove();
-            }
-
-            i++;
-        }
+    if (e.target.id === 'btn-remove') {
+        removeHabit(e);
     }
 
-    if (e.target.id === 'btn-add-count') {
-        let updatedCount = 0;
-
-        let i = 0;
-        while (i < localStorage.length) {
-            let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
-
-            if (e.target.parentNode.id == habit.id) {
-                habit.count = habit.count + 1;
-                localStorage.setItem(localStorage.key(i), JSON.stringify(habit));
-
-                updatedCount = habit.count;
-            }
-
-            i++;
-        }
-
-        let j = 0;
-        while (j < habitList.children.length) {
-            if (habitList.children[j].id == e.target.parentNode.id) {
-                habitList.children[j].querySelector('#habit-count').innerHTML = `${updatedCount}`;
-                
-                // implement record...
-            }
-
-            j++;
-        }
+    if (e.target.id === 'btn-do') {
+        completedHabit(e);
     }
 
-    if (e.target.id === 'btn-minus-count') {
-        let updatedCount = 0;
-
-        let i = 0;
-        while (i < localStorage.length) {
-            let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
-
-            if (e.target.parentNode.id == habit.id) {
-                habit.count = habit.count - 1;
-                
-                if (habit.count < 0) {
-                    habit.count = 0;
-                }
-
-                localStorage.setItem(localStorage.key(i), JSON.stringify(habit));
-
-                updatedCount = habit.count;
-            }
-
-            i++;
-        }
-
-        let j = 0;
-        while (j < habitList.children.length) {
-            if (habitList.children[j].id == e.target.parentNode.id) {
-                habitList.children[j].querySelector('#habit-count').innerHTML = `${updatedCount}`;
-                
-                // implement record...
-            }
-
-            j++;
-        }
+    if (e.target.id === 'btn-undo') {
+        ongoingHabit(e);
     }
 })
 
-window.onload = displayHabits();
+// Window
+
+window.onload = displayAllHabits();
+window.setInterval(nextDay, 1000);

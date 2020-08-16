@@ -7,14 +7,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <form class="habit-form"></form>
-            <label>Start a new habit:</label>
-            <input type="text" id="habit-name" placeholder="Study, workout, ...">
-            <button type="button" class="button-add-habit" id="btn-add-habit">Add</button>
-        </form>
-        <div class="habit-list"></div>
-    </div>
+    <h1 class="main-title">Daily Habits</h1>
+    <form id="habit-form">
+        <input type="text" name="name" placeholder="Add a new habit..." autocomplete="off">
+        <button class="button-add-habit" id="btn-add-habit">Add</button>
+    </form>
+    <ul id="habit-list"><!-- Habits will be appended here --></ul>
 </body>
 <script src="main.js"></script>
 </html>
