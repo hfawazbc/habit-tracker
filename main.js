@@ -5,12 +5,7 @@ let habitObject = {
     id: '',
     name: '',
     startDate: '',
-    score: 0,
-    streak: 0,
-    record: 0,
-    completed: false,
-    doButton: '',
-    undoButton: 'disabled'
+    score: 0
 }
 
 const list = document.querySelector('#habit-list');
@@ -43,37 +38,28 @@ const removeHabit = (event) => {
  */
 const completedHabit = (event) => {
     let updatedScore = 0;
-    let updatedStreak = 0;
 
     let i = 0;
     while (i < localStorage.length) {
         let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
 
         if (event.target.parentElement.parentElement.id == habit.id) {
-            habit.completed = true;
-
-            habit.doButton = 'disabled';
-            habit.undoButton = '';
-
             habit.score++;
-            habit.streak++;
 
             localStorage.setItem(localStorage.key(i), JSON.stringify(habit));
 
             updatedScore = habit.score;
-            updatedStreak = habit.streak;
         }
 
         i++;
     }
 
     let j = 0;
-    while (j < list.children.length) {
+    let flag = false;
+    while (j < list.children.length && flag !== true) {
         if (list.children[j].id == event.target.parentElement.parentElement.id) {
-            list.children[j].querySelector('#btn-do').disabled = true;
-            list.children[j].querySelector('#btn-undo').disabled = false;
-            list.children[j].querySelector('#habit-score').innerHTML = `${updatedScore}`;
-            list.children[j].querySelector('#habit-streak').innerHTML = `Streak: ${updatedStreak} days`;
+            list.children[j].querySelector('#habit-score').innerHTML = `Days: ${updatedScore}`;
+            flag = true;
         }
 
         j++;
@@ -86,37 +72,32 @@ const completedHabit = (event) => {
  */
 const ongoingHabit = (event) => {
     let updatedScore = 0;
-    let updatedStreak = 0;
 
     let i = 0;
     while (i < localStorage.length) {
         let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
 
         if (event.target.parentElement.parentElement.id == habit.id) {
-            habit.completed = false;
-
-            habit.doButton = '';
-            habit.undoButton = 'disabled';
-            
             habit.score--;
-            habit.streak--;
+
+            if (habit.score < 0) {
+                habit.score = 0;
+            }
 
             localStorage.setItem(localStorage.key(i), JSON.stringify(habit));
 
             updatedScore = habit.score;
-            updatedStreak = habit.streak;
         }
 
         i++;
     }
 
     let j = 0;
-    while (j < list.children.length) {
+    let flag = false;
+    while (j < list.children.length && flag !== true) {
         if (list.children[j].id == event.target.parentElement.parentElement.id) {
-            list.children[j].querySelector('#btn-do').disabled = false;
-            list.children[j].querySelector('#btn-undo').disabled = true;
-            list.children[j].querySelector('#habit-score').innerHTML = `${updatedScore}`;
-            list.children[j].querySelector('#habit-streak').innerHTML = `Streak: ${updatedStreak} days`;
+            list.children[j].querySelector('#habit-score').innerHTML = `Days: ${updatedScore}`;
+            flag = true;
         }
 
         j++;
@@ -136,20 +117,12 @@ const displayHabit = (habit) => {
     pName.setAttribute('id', 'habit-name');
 
     let pScore = document.createElement('p');
-    pScore.textContent = `${habit.score}`;
+    pScore.textContent = `Days: ${habit.score}`;
     pScore.setAttribute('id', 'habit-score');
 
     let pStart = document.createElement('p');
     pStart.textContent = `Started: ${habit.startDate}`;
     pStart.setAttribute('id', 'habit-start');
-
-    let pStreak = document.createElement('p');
-    pStreak.textContent = `Streak: ${habit.streak} days`;
-    pStreak.setAttribute('id', 'habit-streak');
-
-    let pRecord = document.createElement('p');
-    pRecord.textContent = `Record: ${habit.record} days`;
-    pRecord.setAttribute('id', 'habit-record');
 
     let div = document.createElement('div');
     div.setAttribute('class', 'button-container');
@@ -176,8 +149,6 @@ const displayHabit = (habit) => {
     li.appendChild(pName);
     li.appendChild(pScore);
     li.appendChild(pStart);
-    li.appendChild(pStreak);
-    li.appendChild(pRecord);
     li.appendChild(div);
 
     list.appendChild(li);
@@ -195,42 +166,6 @@ const displayAllHabits = () => {
         displayHabit(habit);
 
         i++;
-    }
-}
-
-/*
- * nextDay() resets each habit's stats for the next day.
- * If the user completed their habit during the day, their streak will continue.
- * If the user does not complete their habit during the day, their streak and score will reset to 0.
- * The user's record will be updated after each day.
- * window.setInterval calls this function.
- */
-const nextDay = () => {
-    let time = new Date();
-    if (time.toLocaleDateString() === '12:00:00 AM') {
-        let i = 0;
-        while (i < localStorage.length) {
-            let habit = JSON.parse(localStorage.getItem(localStorage.key(i)));
-    
-            if (habit.record < habit.streak) {
-                habit.record = habit.streak;
-            }
-    
-            if (habit.completed === false) {
-                habit.score = 0;
-                habit.streak = 0;
-            }
-    
-            habit.doButton = '';
-            habit.undoButton = 'disabled';
-            habit.completed = false;
-    
-            localStorage.setItem(localStorage.key(i), JSON.stringify(habit));
-    
-            i++;
-        }
-    
-        window.location.reload();
     }
 }
 
@@ -281,4 +216,3 @@ document.addEventListener('click', (e) => {
 // Window
 
 window.onload = displayAllHabits();
-window.setInterval(nextDay, 1000);

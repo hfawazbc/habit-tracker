@@ -6,13 +6,24 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
+/* Variables */
+:root {
+    --color-red: #EC7063;
+    --color-green: #52BE80;
+    --color-blue: #5DADE2;
+    --color-orange-1: #F5B041;
+    --color-orange-2: #D68910;
+    --color-white-1: #fff;
+    --color-white-2: #F4F6F7;
+}
+
 body {
     width: 50%;
     margin: auto;
 
     text-align: center;
 
-    background-color: #F4F6F6;
+    background-color: var(--color-white-2);
 }
 
 /* Title Styles */
@@ -30,6 +41,9 @@ body {
 
     margin-top: 25px;
     margin-bottom: 25px;
+
+    border-radius: 2.5px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px;
 }
 
 input[type="text"] {
@@ -53,13 +67,13 @@ input[type="text"] {
     border-top-right-radius: 2.5px;
     border-bottom-right-radius: 2.5px;
 
-    background-color: #F5B041;
+    background-color: var(--color-orange-1);
 
     cursor: pointer;
 }
 
 .button-add-habit:hover {
-    background-color: #D68910;
+    background-color: var(--color-orange-2);
 
     transition: 0.5s;
 }
@@ -76,28 +90,37 @@ input[type="text"] {
     list-style: none;
 
     border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px;
 
     margin-bottom: 25px;
 
-    background-color: #EAEDED;
+    background-color: var(--color-white-1);
 }
 
-#habit-name, #habit-score {
-    font-size: 2em;
+#habit-name {
+    font-size: 1.5em;
     
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
-#habit-start, #habit-streak, #habit-record {
+#habit-score {
+    font-size: 1.5em;
+    
+    margin-bottom: 10px;
+}
+
+#habit-start {
     font-size: 1em;
     
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 /* Button styles */
 .button-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+
+    column-gap: 5px;
 
     width: 30%;
     margin: auto;
@@ -110,7 +133,7 @@ input[type="text"] {
 
     padding: 5px;
 
-    background-color: #52BE80 ;
+    background-color: var(--color-white-2);
 
     outline: none;
 
@@ -122,7 +145,7 @@ input[type="text"] {
 }
 
 .button-do:hover {
-    background-color: #229954;
+    background-color: var(--color-green);
 
     transition: 0.5s;
 }
@@ -136,13 +159,13 @@ input[type="text"] {
 
     border: none;
 
-    background-color: #5DADE2;
+    background-color: var(--color-white-2);
 
     cursor: pointer;
 }
 
 .button-undo:hover {
-    background-color: #2E86C1;
+    background-color: var(--color-blue);
 
     transition: 0.5s;
 }
@@ -152,7 +175,7 @@ input[type="text"] {
 
     padding: 5px;
 
-    background-color: #EC7063;
+    background-color: var(--color-white-2);
 
     outline: none;
 
@@ -164,7 +187,7 @@ input[type="text"] {
 }
 
 .button-remove:hover {
-    background-color: #CB4335;
+    background-color: var(--color-red);
 
     transition: 0.5s;
 }
