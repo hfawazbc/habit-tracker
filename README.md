@@ -25,4 +25,4 @@ git pull https://github.com/hfawazbc/habit-tracker
 Launch ```index.html``` in your browser to interact with the website.
 
 ## License
-[MIT](../blob/master/LICENSE)
+[MIT](./LICENSE)
