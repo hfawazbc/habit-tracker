@@ -9,6 +9,7 @@
 
 ## Description
 Habit Tracker is a CRUD application that allows you to keep track of your daily habits.
+Visit site: https://hf-habit-tracker.herokuapp.com/
 
 ## Technologies
 - HTML5
